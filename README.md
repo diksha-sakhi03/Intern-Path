@@ -144,16 +144,6 @@ Use any valid email address to log in as a student.
 
 ---
 
-## Screenshots
-
-> Add screenshots of your project here.
-
-- Login Page
-- Student Dashboard
-- Recruiter Dashboard
-
----
-
 ## Future Enhancements
 
 - Secure authentication using passwords and JWT
