@@ -38,22 +38,41 @@ async function fetchApplications() {
 
 // save new application to server
 async function saveApplication(newApp) {
-    await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newApp)
-    });
-    fetchApplications();
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newApp)
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        await fetchApplications();
+        return true;
+    } catch (err) {
+        console.error("Failed to save application:", err);
+        alert("Failed to submit application. Please make sure the backend server is running and database is connected.");
+        return false;
+    }
 }
 
 // Update status
 async function updateStatusOnServer(appId, newStatus) {
-    await fetch(`${API_URL}/${appId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
-    });
-    fetchApplications();
+    try {
+        const response = await fetch(`${API_URL}/${appId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        await fetchApplications();
+        alert("Status updated successfully!");
+    } catch (err) {
+        console.error("Failed to update status:", err);
+        alert("Failed to update application status. Please check the backend server.");
+    }
 }
 
 
@@ -69,7 +88,7 @@ function selectRole(role) {
             alert("Please enter a valid email");
             return;
         }
-        currentUserEmail = emailInput;
+        currentUserEmail = emailInput.toLowerCase();
     } else if (role === 'recruiter') {
         const emailInput = document.getElementById('recruiter-email').value;
         if (!emailInput) {
@@ -186,10 +205,12 @@ document.getElementById('application-form').addEventListener('submit', async (e)
         status: 'applied'
     };
 
-    await saveApplication(newApplication);
-    closeModal();
-    alert('Application submitted!');
-    showSection('my-applications');
+    const success = await saveApplication(newApplication);
+    if (success) {
+        closeModal();
+        alert('Application submitted successfully!');
+        showSection('my-applications');
+    }
 });
 
 function renderUserApplications() { // my application tab data
